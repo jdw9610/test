@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.smbms.dao.user.UserMapper">
+
+	<!-- 查询用户表记录数 -->
+	<select id="count" resultType="int">
+		select count(1) as count from smbms_user
+	</select>
+	
+	
+	<!-- User表模糊查询 -->
+	<select id="findAll" resultType="user">
+	SELECT * FROM smbms_user WHERE userName LIKE concat('%',#{userName},'%')
+	and userRole=#{userRole}
+	</select>
+	
+	
+	<!-- 用户表联合身份表查询 -->
+	<resultMap type="user" id="u">
+	<id column="id" property="id"/>
+	<result column="userName" property="userName"/>
+	<association property="role" javaType="Role">
+	<id column="id" property="id"/>
+	<result column="roleName" property="roleName"/>
+	</association>
+	</resultMap>
+	<select id="selectwithrole" resultMap="u">
+	SELECT * FROM smbms_user u,smbms_role r WHERE r.id=u.userRole
+	</select>
+	
+	<!-- 角色信息的增加操作 -->
+	
+	<insert id="AddRole" parameterType="Role" >
+	INSERT INTO smbms_role(	id,roleCode,
+	roleName,createdBy,creationDate) VALUE(#{id},
+	#{roleCode},#{roleName},#{createdBy},#{creationDate})
+	</insert>
+	                
+	<!-- 角色根据ID修改 -->       
+	<update id="UpdateRole" parameterType="Role">
+	UPDATE smbms_role SET roleCode=#{roleCode},roleName=#{roleName},
+	createdBy=#{createdBy},creationDate=#{creationDate} WHERE id=#{id}
+	</update>  
+	
+	
+	<!-- 用户根据角色ID删除 -->  
+	
+	<delete id="DelRoleForUser" parameterType="user">
+	DELETE FROM smbms_user WHERE
+	 userRole=#{userRole}
+	</delete>                
+	
+	
+	<!-- 角色根据ID删除 -->  
+	<delete id="DelRole" parameterType="Role">
+	DELETE FROM smbms_role WHERE id=#{id}
+	</delete>    
+	
+	
+	<!-- Role表模糊查询 -->
+	<select id="RolefindAll" resultType="Role">
+	SELECT * FROM smbms_role WHERE roleName LIKE concat('%',#{name},'%')
+	</select>
+	
+	
+	                     
+</mapper>
